@@ -21,14 +21,14 @@ def get_api_url(uid, server_name):
         return None
 
 regions = {
-    'me': {'ar': ' ', 'en': 'Middle East'},
-    'eu': {'ar': '', 'en': 'Europe'},
-    'us': {'ar': ' ', 'en': 'North America'},
-    'in': {'ar': '', 'en': 'India'},
-    'br': {'ar': '', 'en': 'Brazil'},
-    'id': {'ar': '', 'en': 'Indonesia'},
-    'tr': {'ar': '', 'en': 'Turkey'},
-    'th': {'ar': '', 'en': 'Thailand'}
+    'me': {'ar': 'الشرق الأوسط', 'en': 'Middle East'},
+    'eu': {'ar': 'أوروبا', 'en': 'Europe'},
+    'us': {'ar': 'أمريكا الشمالية', 'en': 'North America'},
+    'in': {'ar': 'الهند', 'en': 'India'},
+    'br': {'ar': 'البرازيل', 'en': 'Brazil'},
+    'id': {'ar': 'إندونيسيا', 'en': 'Indonesia'},
+    'tr': {'ar': 'تركيا', 'en': 'Turkey'},
+    'th': {'ar': 'تايلاند', 'en': 'Thailand'}
 }
 
 def login_required(f):
@@ -191,12 +191,12 @@ LOGIN_TEMPLATE = """
         
         <form method="POST" action="/login">
             <div class="input-group">
-                <label> Username</label>
+                <label>👤 Username</label>
                 <input type="text" name="username" placeholder="Enter username" required>
             </div>
             
             <div class="input-group">
-                <label> Password</label>
+                <label>🔑 Password</label>
                 <input type="password" name="password" placeholder="Enter password" required>
             </div>
             
@@ -476,20 +476,20 @@ MAIN_TEMPLATE = """
 </head>
 <body>
     <div class="container">
-        <a href="/logout" class="logout-btn">{% if lang == 'ar' %} {% else %} Logout{% endif %}</a>
+        <a href="/logout" class="logout-btn">{% if lang == 'ar' %}🚪 خروج{% else %}🚪 Logout{% endif %}</a>
         <div class="user-badge">{{ username }}</div>
         
-        <h1>ZIKO-TOOLS</h1>
+        <h1>ZIKO-TEAM</h1>
         <h2>{{ team_name }}</h2>
 
         <div class="language-switch">
-            <a href="?lang=ar"></a> | <a href="?lang=en">English</a>
+            <a href="?lang=ar">العربية</a> | <a href="?lang=en">English</a>
         </div>
 
         <div class="tabs">
-            <button class="tab-btn active" onclick="showTab('likes')">{% if lang == 'ar' %} {% else %}Send Likes{% endif %}</button>
-            <button class="tab-btn" onclick="showTab('check')">{% if lang == 'ar' %} {% else %}Ban Check{% endif %}</button>
-            <button class="tab-btn" onclick="showTab('info')">{% if lang == 'ar' %} {% else %}Player Info{% endif %}</button>
+            <button class="tab-btn active" onclick="showTab('likes')">{% if lang == 'ar' %}إرسال لايكات{% else %}Send Likes{% endif %}</button>
+            <button class="tab-btn" onclick="showTab('check')">{% if lang == 'ar' %}فحص الحظر{% else %}Ban Check{% endif %}</button>
+            <button class="tab-btn" onclick="showTab('info')">{% if lang == 'ar' %}معلومات الحساب{% else %}Player Info{% endif %}</button>
         </div>
 
         {% if error %}
@@ -505,7 +505,7 @@ MAIN_TEMPLATE = """
                 <label>{% if lang == 'ar' %}UID{% else %}UID{% endif %}</label>
                 <input type="text" name="uid" placeholder="Your UID here" required>
 
-                <label>{% if lang == 'ar' %}{% else %}Region{% endif %}</label>
+                <label>{% if lang == 'ar' %}المنطقة{% else %}Region{% endif %}</label>
                 <select name="server">
                     {% for code, names in regions.items() %}
                     <option value="{{ code }}">{{ names[lang] }}</option>
@@ -513,7 +513,7 @@ MAIN_TEMPLATE = """
                 </select>
 
                 <button type="submit">
-                    {% if lang == 'ar' %}{% else %}Send{% endif %}
+                    {% if lang == 'ar' %}إرسال{% else %}Send{% endif %}
                 </button>
             </form>
         </div>
@@ -526,7 +526,7 @@ MAIN_TEMPLATE = """
                 <input type="text" name="uid" placeholder="Your UID here" required>
 
                 <button type="submit">
-                    {% if lang == 'ar' %}{% else %}Check{% endif %}
+                    {% if lang == 'ar' %}فحص{% else %}Check{% endif %}
                 </button>
             </form>
         </div>
@@ -539,7 +539,7 @@ MAIN_TEMPLATE = """
                 <input type="text" name="uid" placeholder="Your UID here" required>
 
                 <button type="submit">
-                    {% if lang == 'ar' %} {% else %}Get Info{% endif %}
+                    {% if lang == 'ar' %}جلب المعلومات{% else %}Get Info{% endif %}
                 </button>
             </form>
         </div>
@@ -611,7 +611,7 @@ def login():
             session['username'] = username
             return redirect(url_for('index', lang='en'))
         else:
-            error = " Invalid username or password"
+            error = "❌ Invalid username or password"
             return render_template_string(LOGIN_TEMPLATE, team_name=TEAM_NAME, error=error)
     
     return render_template_string(LOGIN_TEMPLATE, team_name=TEAM_NAME, error=None)
@@ -638,13 +638,13 @@ def send_likes():
     lang = request.form.get('lang', 'ar')
 
     if not uid:
-        error = "   UID" if lang == 'ar' else " Please enter UID"
+        error = "⚠️ الرجاء إدخال UID" if lang == 'ar' else "⚠️ Please enter UID"
         return render_template_string(MAIN_TEMPLATE, team_name=TEAM_NAME, regions=regions, lang=lang,
                                        error=error, result=None, username=session.get('username', ''))
 
     api_url = get_api_url(uid, server)
     if not api_url:
-        error = "   " if lang == 'ar' else " System error"
+        error = "❌ خطأ في النظام" if lang == 'ar' else "❌ System error"
         return render_template_string(MAIN_TEMPLATE, team_name=TEAM_NAME, regions=regions, lang=lang,
                                        error=error, result=None, username=session.get('username', ''))
 
@@ -659,7 +659,7 @@ def send_likes():
         status = data.get('status', 0)
 
         if lang == 'ar':
-            status_text = {0: "", 1: "", 2: "", 3: ""}.get(status, ' ')
+            status_text = {0: "فشل", 1: "محدود", 2: "ناجح", 3: "مغلق"}.get(status, 'غير معروف')
             region_name = regions.get(server, {}).get('ar', server.upper())
         else:
             status_text = {0: "Failed", 1: "Limited", 2: "Success", 3: "Locked"}.get(status, 'Unknown')
@@ -693,7 +693,7 @@ def send_likes():
                                        error=None, result=f"<pre>{result_text}</pre>", username=session.get('username', ''))
 
     except Exception as e:
-        error = "   " if lang == 'ar' else " Connection failed"
+        error = "❌ فشل الاتصال بالخادم" if lang == 'ar' else "❌ Connection failed"
         return render_template_string(MAIN_TEMPLATE, team_name=TEAM_NAME, regions=regions, lang=lang,
                                        error=error, result=None, username=session.get('username', ''))
 
@@ -704,7 +704,7 @@ def check_ban():
     lang = request.form.get('lang', 'ar')
 
     if not uid:
-        error = "   UID" if lang == 'ar' else " Please enter UID"
+        error = "⚠️ الرجاء إدخال UID" if lang == 'ar' else "⚠️ Please enter UID"
         return render_template_string(MAIN_TEMPLATE, team_name=TEAM_NAME, regions=regions, lang=lang,
                                        error=error, result=None, username=session.get('username', ''))
 
@@ -718,15 +718,15 @@ def check_ban():
         ban_period = data.get('BanDuration', 0)
         
         result_lines = []
-        result_lines.append(f" Result for UID: {uid}")
-        result_lines.append("")
+        result_lines.append(f"✨ Result for UID: {uid}")
+        result_lines.append("━━━━━━━━━━━━━━━")
         result_lines.append(f"username: {username}")
         result_lines.append(f"uid: {uid}")
         result_lines.append(f"status: {'NOT BANNED' if not ban_status else 'BANNED'}")
         result_lines.append(f"ban_period: {ban_period}")
-        result_lines.append(f"is_banned: {' ' if not ban_status else ' ' if lang == 'ar' else ' No' if not ban_status else ' Yes'}")
-        result_lines.append("")
-        result_lines.append(" Powered by: @ZikoB0SS")
+        result_lines.append(f"is_banned: {'✅ لا' if not ban_status else '❌ نعم' if lang == 'ar' else '✅ No' if not ban_status else '❌ Yes'}")
+        result_lines.append("━━━━━━━━━━━━━━━")
+        result_lines.append("💎 Powered by: @ZikoB0SS")
 
         result_text = "\n".join(result_lines)
 
@@ -734,7 +734,7 @@ def check_ban():
                                        error=None, result=f"<pre>{result_text}</pre>", username=session.get('username', ''))
 
     except Exception as e:
-        error = f" : {str(e)}" if lang == 'ar' else f" Error: {str(e)}"
+        error = f"❌ خطأ: {str(e)}" if lang == 'ar' else f"❌ Error: {str(e)}"
         return render_template_string(MAIN_TEMPLATE, team_name=TEAM_NAME, regions=regions, lang=lang,
                                        error=error, result=None, username=session.get('username', ''))
 
@@ -745,7 +745,7 @@ def player_info():
     lang = request.form.get('lang', 'ar')
 
     if not uid:
-        error = "   UID" if lang == 'ar' else " Please enter UID"
+        error = "⚠️ الرجاء إدخال UID" if lang == 'ar' else "⚠️ Please enter UID"
         return render_template_string(MAIN_TEMPLATE, team_name=TEAM_NAME, regions=regions, lang=lang,
                                        error=error, result=None, username=session.get('username', ''))
 
@@ -763,21 +763,21 @@ def player_info():
 
         result_html = f"""
 <div style="font-family: 'Courier New', monospace;">
-    <h4 style="color: red; text-align: center;">{' ' if lang == 'ar' else 'Player Information'}</h4>
+    <h4 style="color: red; text-align: center;">{'معلومات اللاعب' if lang == 'ar' else 'Player Information'}</h4>
     
     <div style="background: #111; padding: 15px; border-radius: 10px; margin: 10px 0;">
-        <h5 style="color: red; margin: 0 0 10px 0;">{' ' if lang == 'ar' else 'Basic Info'}</h5>
+        <h5 style="color: red; margin: 0 0 10px 0;">{'المعلومات الأساسية' if lang == 'ar' else 'Basic Info'}</h5>
         <div class="info-grid">
             <div class="info-item">
-                <div class="info-label">{'' if lang == 'ar' else 'Name'}</div>
+                <div class="info-label">{'الاسم' if lang == 'ar' else 'Name'}</div>
                 <div class="info-value" style="word-break: break-all;">{basic.get('username', 'N/A')}</div>
             </div>
             <div class="info-item">
-                <div class="info-label">{'' if lang == 'ar' else 'Level'}</div>
+                <div class="info-label">{'المستوى' if lang == 'ar' else 'Level'}</div>
                 <div class="info-value">{basic.get('level', 'N/A')}</div>
             </div>
             <div class="info-item">
-                <div class="info-label">{'' if lang == 'ar' else 'Exp'}</div>
+                <div class="info-label">{'الخبرة' if lang == 'ar' else 'Exp'}</div>
                 <div class="info-value">{basic.get('Exp', 'N/A')}</div>
             </div>
             <div class="info-item">
@@ -789,65 +789,65 @@ def player_info():
                 <div class="info-value">{basic.get('csrankscore', 'N/A')}</div>
             </div>
             <div class="info-item">
-                <div class="info-label">{'' if lang == 'ar' else 'Likes'}</div>
+                <div class="info-label">{'الإعجابات' if lang == 'ar' else 'Likes'}</div>
                 <div class="info-value">{basic.get('likes', 0):,}</div>
             </div>
             <div class="info-item">
-                <div class="info-label">{'' if lang == 'ar' else 'Region'}</div>
+                <div class="info-label">{'المنطقة' if lang == 'ar' else 'Region'}</div>
                 <div class="info-value">{basic.get('region', 'N/A')}</div>
             </div>
             <div class="info-item">
-                <div class="info-label">{'' if lang == 'ar' else 'Bio'}</div>
+                <div class="info-label">{'السيرة' if lang == 'ar' else 'Bio'}</div>
                 <div class="info-value" style="word-break: break-all;">{basic.get('bio', 'N/A')}</div>
             </div>
         </div>
     </div>
 
     <div style="background: #111; padding: 15px; border-radius: 10px; margin: 10px 0;">
-        <h5 style="color: red; margin: 0 0 10px 0;">{'' if lang == 'ar' else 'Dates'}</h5>
+        <h5 style="color: red; margin: 0 0 10px 0;">{'التواريخ' if lang == 'ar' else 'Dates'}</h5>
         <div class="info-grid">
             <div class="info-item">
-                <div class="info-label">{' ' if lang == 'ar' else 'Created'}</div>
+                <div class="info-label">{'تاريخ الإنشاء' if lang == 'ar' else 'Created'}</div>
                 <div class="info-value">{create_at}</div>
             </div>
             <div class="info-item">
-                <div class="info-label">{' ' if lang == 'ar' else 'Last Login'}</div>
+                <div class="info-label">{'آخر دخول' if lang == 'ar' else 'Last Login'}</div>
                 <div class="info-value">{last_login}</div>
             </div>
         </div>
     </div>
 
     <div style="background: #111; padding: 15px; border-radius: 10px; margin: 10px 0;">
-        <h5 style="color: red; margin: 0 0 10px 0;">{' ' if lang == 'ar' else 'Guild Info'}</h5>
+        <h5 style="color: red; margin: 0 0 10px 0;">{'معلومات العشيرة' if lang == 'ar' else 'Guild Info'}</h5>
         <div class="info-grid">
             <div class="info-item">
-                <div class="info-label">{' ' if lang == 'ar' else 'Guild Name'}</div>
+                <div class="info-label">{'اسم العشيرة' if lang == 'ar' else 'Guild Name'}</div>
                 <div class="info-value" style="word-break: break-all;">{clan.get('clanname', 'N/A')}</div>
             </div>
             <div class="info-item">
-                <div class="info-label">{' ' if lang == 'ar' else 'Guild Level'}</div>
+                <div class="info-label">{'مستوى العشيرة' if lang == 'ar' else 'Guild Level'}</div>
                 <div class="info-value">{clan.get('guildlevel', 'N/A')}</div>
             </div>
             <div class="info-item">
-                <div class="info-label">{'' if lang == 'ar' else 'Members'}</div>
+                <div class="info-label">{'الأعضاء' if lang == 'ar' else 'Members'}</div>
                 <div class="info-value">{clan.get('livemember', 'N/A')}</div>
             </div>
         </div>
     </div>
 
     <div style="background: #111; padding: 15px; border-radius: 10px; margin: 10px 0;">
-        <h5 style="color: red; margin: 0 0 10px 0;">{' ' if lang == 'ar' else 'Guild Admin'}</h5>
+        <h5 style="color: red; margin: 0 0 10px 0;">{'أدمن العشيرة' if lang == 'ar' else 'Guild Admin'}</h5>
         <div class="info-grid">
             <div class="info-item">
-                <div class="info-label">{'' if lang == 'ar' else 'Name'}</div>
+                <div class="info-label">{'الاسم' if lang == 'ar' else 'Name'}</div>
                 <div class="info-value" style="word-break: break-all;">{clan_admin.get('adminname', 'N/A')}</div>
             </div>
             <div class="info-item">
-                <div class="info-label">{'' if lang == 'ar' else 'Level'}</div>
+                <div class="info-label">{'المستوى' if lang == 'ar' else 'Level'}</div>
                 <div class="info-value">{clan_admin.get('level', 'N/A')}</div>
             </div>
             <div class="info-item">
-                <div class="info-label">{'' if lang == 'ar' else 'Exp'}</div>
+                <div class="info-label">{'الخبرة' if lang == 'ar' else 'Exp'}</div>
                 <div class="info-value">{clan_admin.get('exp', 'N/A')}</div>
             </div>
             <div class="info-item">
@@ -862,7 +862,7 @@ def player_info():
     </div>
 
     <div style="margin-top: 15px; color: #888; font-size: 0.9em; text-align: center;">
-         ZIKO-TEAM
+        💎 ZIKO-TEAM
     </div>
 </div>
 """
@@ -871,7 +871,7 @@ def player_info():
                                        error=None, result=result_html, username=session.get('username', ''))
 
     except Exception as e:
-        error = f" : {str(e)}" if lang == 'ar' else f" Error: {str(e)}"
+        error = f"❌ خطأ: {str(e)}" if lang == 'ar' else f"❌ Error: {str(e)}"
         return render_template_string(MAIN_TEMPLATE, team_name=TEAM_NAME, regions=regions, lang=lang,
                                        error=error, result=None, username=session.get('username', ''))
 
