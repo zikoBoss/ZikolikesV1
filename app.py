@@ -2,6 +2,7 @@ from flask import Flask, request, render_template_string, session, redirect, url
 import requests
 import base64
 import os
+import urllib.parse
 from functools import wraps
 from datetime import datetime
 
@@ -479,7 +480,7 @@ MAIN_TEMPLATE = """
         <a href="/logout" class="logout-btn">{% if lang == 'ar' %}🚪 خروج{% else %}🚪 Logout{% endif %}</a>
         <div class="user-badge">{{ username }}</div>
         
-        <h1>ZIKO-TEAM</h1>
+        <h1>ZIKO-TOOLS</h1>
         <h2>{{ team_name }}</h2>
 
         <div class="language-switch">
@@ -750,6 +751,7 @@ def player_info():
                                        error=error, result=None, username=session.get('username', ''))
 
     try:
+        # 1. جلب معلومات اللاعب
         url = f"https://foubia-info-ff.vercel.app/{uid}"
         response = requests.get(url, timeout=10)
         data = response.json()
@@ -758,9 +760,41 @@ def player_info():
         clan = data.get("claninfo", [{}])[0]
         clan_admin = data.get("clanadmin", [{}])[0]
 
+        player_name = basic.get('username', 'Unknown')
+        player_level = basic.get('level', '1')
+        guild_name = clan.get('clanname', '')
+
+        # 2. القيم الثابتة للبانر
+        AVATAR_ID = "902028017"
+        BANNER_ID = "901043008"
+        PIN_ID = "0"
+        PRIME_LEVEL = "1"
+
+        # 3. بناء رابط البانر مع ترميز الاسم
+        encoded_name = urllib.parse.quote(player_name)
+        encoded_guild = urllib.parse.quote(guild_name) if guild_name else ""
+        
+        banner_url = (f"https://banner-apibykala-api.vercel.app/profile"
+                      f"?avatar_id={AVATAR_ID}"
+                      f"&banner_id={BANNER_ID}"
+                      f"&pin_id={PIN_ID}"
+                      f"&prime_level={PRIME_LEVEL}"
+                      f"&level={player_level}"
+                      f"&name={encoded_name}"
+                      f"&guild={encoded_guild}")
+
+        # 4. التحقق من البانر (اختياري)
+        try:
+            banner_response = requests.get(banner_url, timeout=5)
+            banner_ok = banner_response.status_code == 200
+        except:
+            banner_ok = False
+
+        # 5. تنسيق التواريخ
         last_login = format_timestamp(basic.get('lastlogin', 0))
         create_at = format_timestamp(basic.get('createat', 0))
 
+        # 6. بناء HTML النتيجة مع البانر
         result_html = f"""
 <div style="font-family: 'Courier New', monospace;">
     <h4 style="color: red; text-align: center;">{'معلومات اللاعب' if lang == 'ar' else 'Player Information'}</h4>
@@ -858,6 +892,16 @@ def player_info():
                 <div class="info-label">CS</div>
                 <div class="info-value">{clan_admin.get('cspoint', 'N/A')}</div>
             </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 30px; text-align: center;">
+        <h5 style="color: red;">{'بانر اللاعب' if lang == 'ar' else 'Player Banner'}</h5>
+        <div style="background: #111; padding: 15px; border-radius: 10px;">
+            <img src="{banner_url}" alt="Player Banner" style="max-width: 100%; border: 2px solid red; border-radius: 10px;">
+            <p style="color: #888; font-size: 0.8em; margin-top: 10px;">
+                {'تم التوليد تلقائياً' if lang == 'ar' else 'Auto-generated'}
+            </p>
         </div>
     </div>
 
